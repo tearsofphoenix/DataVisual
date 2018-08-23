@@ -166,10 +166,15 @@ export default class MenuBuilder {
       const str = data.replace(/\u{0000}/ug, '')
       const [header, result] = parseLines(str)
       const [start, end] = findTimeRange(result)
-      const timeRange = generateTimeRange(start, end)
+      const timeRange = generateTimeRange(moment(start), moment(end))
       const [timeLabels, finalData] = updateTimeRange(timeRange, result)
 
-      const title = `${start.year()}-${start.month()}-${start.date()}至${end.year()}-${end.month()}-${end.date()}数据统计`
+      let title
+      if (end.diff(start, 'days') < 1) {
+        title = `${start.year()}-${start.month() + 1}-${start.date()}数据统计`
+      } else {
+        title = `${start.year()}-${start.month() + 1}-${start.date()}至${end.year()}-${end.month() + 1}-${end.date()}数据统计`
+      }
       this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
     } else {
       dialog.showErrorBox('提示', '该文件不是合法的CSV文件！')
@@ -297,7 +302,7 @@ export default class MenuBuilder {
     const subMenuView =
       process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow];
+    return [subMenuAbout, subMenuFile, subMenuView];
   }
 
   buildDefaultTemplate() {
