@@ -166,7 +166,7 @@ export default class MenuBuilder {
     });
   }
 
-  loadCSVFile(filePath) {
+  loadCSVFile = (filePath) => {
     const data = fs.readFileSync(filePath, 'utf8')
     if (data && data.length > 0) {
       const str = data.replace(/\u{0000}/ug, '')
@@ -184,7 +184,7 @@ export default class MenuBuilder {
     }
   }
 
-  updateData() {
+  updateData = () => {
     const {start, end, result, step} = this.currentData
     const timeRange = generateTimeRange(moment(start), moment(end), step)
     const [timeLabels, finalData] = updateTimeRange(timeRange, result, step)
@@ -198,7 +198,7 @@ export default class MenuBuilder {
     this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
   }
 
-  tryOpenFileHandler() {
+  tryOpenFileHandler = () => {
       const filePath = dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [{name: 'CSV', extensions: ['csv']}],
@@ -209,7 +209,7 @@ export default class MenuBuilder {
       }
   }
 
-  buildDarwinTemplate() {
+  buildDarwinTemplate = () => {
     const subMenuFile = {
       label: 'File',
       submenu: [
@@ -223,14 +223,14 @@ export default class MenuBuilder {
       label: 'Electron',
       submenu: [
         {
-          label: 'About ElectronReact',
+          label: 'About DataAnalysis',
           selector: 'orderFrontStandardAboutPanel:'
         },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide ElectronReact',
+          label: 'Hide DataAnalysis',
           accelerator: 'Command+H',
           selector: 'hide:'
         },
@@ -311,7 +311,7 @@ export default class MenuBuilder {
     return [subMenuAbout, subMenuFile, subMenuView];
   }
 
-  buildDefaultTemplate() {
+  buildDefaultTemplate = () => {
     const templateDefault = [
       {
         label: '&File',
