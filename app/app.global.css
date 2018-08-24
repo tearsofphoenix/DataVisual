@@ -3,6 +3,7 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 @import "~@fortawesome/fontawesome-free/css/all.css";
+@import "~rc-slider/assets/index.css";
 
 body {
   margin: 0;
@@ -45,4 +46,8 @@ a:hover {
   opacity: 1;
   text-decoration: none;
   cursor: pointer;
+}
+
+.rc-slider-mark-text {
+  color: #222222;
 }

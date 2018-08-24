@@ -1,8 +1,9 @@
 // @flow
-import { app, Menu, dialog, shell, BrowserWindow } from 'electron';
+import { app, Menu, ipcMain, dialog, shell, BrowserWindow } from 'electron';
 import fs from 'fs'
 import moment from 'moment';
 
+const kDefaultStep = 10
 const kSegments = [
   {text: '15s'},
   {text: '30s'},
@@ -67,7 +68,7 @@ function findTimeRange(parts) {
   return [finalStart, finalEnd]
 }
 
-function generateTimeRange(start, end, step = 10) {
+function generateTimeRange(start, end, step = kDefaultStep) {
   const result = []
   let timeLooper = start
   while (end.diff(timeLooper, 'minutes') > 0) {
@@ -82,7 +83,7 @@ function generateTimeRange(start, end, step = 10) {
   return result
 }
 
-function updateTimeRange(timeRange, parts, step = 10) {
+function updateTimeRange(timeRange, parts, step = kDefaultStep) {
   parts.forEach(pLooper => {
     const idx = timeRange.findIndex(r => {
       const diff = pLooper.start.diff(r.time, 'minutes')
@@ -123,6 +124,11 @@ export default class MenuBuilder {
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    const kTimeMap = [10, 10, 30, 60, 240, 720, 1440, 10080]
+    ipcMain.on('$view.chart.slider.changed', (event, arg) => {
+      this.currentData.step = kTimeMap[arg]
+      this.updateData()
+    })
   }
 
   buildMenu() {
@@ -166,19 +172,30 @@ export default class MenuBuilder {
       const str = data.replace(/\u{0000}/ug, '')
       const [header, result] = parseLines(str)
       const [start, end] = findTimeRange(result)
-      const timeRange = generateTimeRange(moment(start), moment(end))
-      const [timeLabels, finalData] = updateTimeRange(timeRange, result)
-
-      let title
-      if (end.diff(start, 'days') < 1) {
-        title = `${start.year()}-${start.month() + 1}-${start.date()}数据统计`
-      } else {
-        title = `${start.year()}-${start.month() + 1}-${start.date()}至${end.year()}-${end.month() + 1}-${end.date()}数据统计`
+      this.currentData = {
+        start,
+        end,
+        result,
+        step: kDefaultStep
       }
-      this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
+      this.updateData()
     } else {
       dialog.showErrorBox('提示', '该文件不是合法的CSV文件！')
     }
+  }
+
+  updateData() {
+    const {start, end, result, step} = this.currentData
+    const timeRange = generateTimeRange(moment(start), moment(end), step)
+    const [timeLabels, finalData] = updateTimeRange(timeRange, result, step)
+
+    let title
+    if (end.diff(start, 'days') < 1) {
+      title = `${start.year()}-${start.month() + 1}-${start.date()}数据统计`
+    } else {
+      title = `${start.year()}-${start.month() + 1}-${start.date()}至${end.year()}-${end.month() + 1}-${end.date()}数据统计`
+    }
+    this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
   }
 
   buildDarwinTemplate() {

@@ -6,9 +6,21 @@ import {ipcRenderer} from 'electron'
 import moment from 'moment'
 import 'moment-timezone'
 import defaultOption from './option'
+import Slider from 'rc-slider'
+
 type Props = {};
 
 moment.tz.setDefault('Asia/Shanghai')
+
+const kMarks = {
+1: '10min',
+2: '30min',
+3: '1h',
+4: '4h',
+5: '12h',
+6: '1d',
+7: '7d'
+}
 
 export default class HomePage extends Component<Props> {
   props: Props;
@@ -58,10 +70,25 @@ export default class HomePage extends Component<Props> {
     </div>
   }
 
+  didSliderValueChanged(value) {
+    console.log(value)
+    if (value) {
+      ipcRenderer.send('$view.chart.slider.changed', value)
+    }
+  }
+
   render() {
     const {option} = this.state
     const hasData = Object.keys(option).length > 0
-    return (<div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex'}}>
+    const sliderWrapper = {
+      margin: '20px 40px', width: '400px', display: 'flex',
+      alignSelf: 'flex-end', position: 'absolute', right: '100px',
+      zIndex: 100
+    }
+    return (<div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
+      {hasData && (<div style={sliderWrapper}>
+        <Slider min={1} marks={kMarks} step={null} onChange={this.didSliderValueChanged} defaultValue={1} max={7} />
+      </div>)}
       {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
       {!hasData && this._renderEmpty()}
     </div>);
