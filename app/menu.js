@@ -198,22 +198,24 @@ export default class MenuBuilder {
     this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
   }
 
+  tryOpenFileHandler() {
+      const filePath = dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{name: 'CSV', extensions: ['csv']}],
+        message: '请选择CSV数据文件'
+      })
+      if (filePath && filePath.length > 0) {
+        this.loadCSVFile(filePath[0])
+      }
+  }
+
   buildDarwinTemplate() {
     const subMenuFile = {
       label: 'File',
       submenu: [
         {
           label: 'Open',
-          click: () => {
-            const filePath = dialog.showOpenDialog({
-              properties: ['openFile'],
-              filters: [{name: 'CSV', extensions: ['csv']}],
-              message: '请选择CSV数据文件'
-            })
-            if (filePath && filePath.length > 0) {
-              this.loadCSVFile(filePath[0])
-            }
-          }
+          click: this.tryOpenFileHandler
         }
       ]
     }
@@ -302,19 +304,6 @@ export default class MenuBuilder {
         }
       ]
     };
-    const subMenuWindow = {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Minimize',
-          accelerator: 'Command+M',
-          selector: 'performMiniaturize:'
-        },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-        { type: 'separator' },
-        { label: 'Bring All to Front', selector: 'arrangeInFront:' }
-      ]
-    };
 
     const subMenuView =
       process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
@@ -329,7 +318,8 @@ export default class MenuBuilder {
         submenu: [
           {
             label: '&Open',
-            accelerator: 'Ctrl+O'
+            accelerator: 'Ctrl+O',
+            click: this.tryOpenFileHandler
           },
           {
             label: '&Close',
