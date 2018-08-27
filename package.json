@@ -208,6 +208,9 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.0-14",
+    "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
+    "@fortawesome/react-fontawesome": "^0.1.0-11",
     "devtron": "^1.4.0",
     "echarts": "^4.1.0",
     "echarts-for-react": "^2.0.14",
@@ -224,6 +227,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-router-redux": "^5.0.0-alpha.6",
+    "react-split-pane": "^0.1.82",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
     "source-map-support": "^0.5.6",

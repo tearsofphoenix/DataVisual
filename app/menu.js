@@ -129,6 +129,9 @@ export default class MenuBuilder {
       this.currentData.step = kTimeMap[arg]
       this.updateData()
     })
+    ipcMain.on('$chart.did-get.image', (event, arg) => {
+      this.saveImageData(arg)
+    })
   }
 
   buildMenu() {
@@ -209,13 +212,42 @@ export default class MenuBuilder {
       }
   }
 
+  saveImageData = (base64Image) => {
+    if (base64Image && base64Image.length > 0) {
+      const filePath = dialog.showSaveDialog(this.mainWindow, {
+        title: '保存图片',
+        filters: [{name: 'png', extensions: ['png']}],
+        message: '请选择保存路径'
+      })
+      if (filePath && filePath.length > 0) {
+        const base64Data = base64Image.replace(/^data:image\/png;base64,/, '');
+
+        fs.writeFile(filePath, base64Data, 'base64', (err) => {
+          if (err) {
+            dialog.showErrorBox('提示', err.message)
+          }
+        })
+      }
+    }
+  }
+
+  saveAsImage = () => {
+    this.mainWindow.webContents.send('$chart.get.image')
+  }
+
   buildDarwinTemplate = () => {
     const subMenuFile = {
       label: 'File',
       submenu: [
         {
           label: 'Open',
+          accelerator: 'Command+O',
           click: this.tryOpenFileHandler
+        },
+        {
+          label: 'Save as Image',
+          accelerator: 'Command+S',
+          click: this.saveAsImage
         }
       ]
     }
@@ -320,6 +352,11 @@ export default class MenuBuilder {
             label: '&Open',
             accelerator: 'Ctrl+O',
             click: this.tryOpenFileHandler
+          },
+          {
+            label: '&Save as Image',
+            accelerator: 'Ctrl+S',
+            click: this.saveAsImage
           },
           {
             label: '&Close',

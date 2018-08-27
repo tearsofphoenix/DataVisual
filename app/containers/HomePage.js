@@ -1,12 +1,15 @@
 // @flow
 import React, { Component } from 'react'
+import SplitPane from 'react-split-pane'
 import 'echarts-gl'
 import ReactEcharts from 'echarts-for-react'
 import {ipcRenderer} from 'electron'
 import moment from 'moment'
 import 'moment-timezone'
-import defaultOption from './option'
 import Slider from 'rc-slider'
+import Sidebar from './Sidebar'
+import Toolbar from './Toolbar'
+import defaultOption from './option'
 
 type Props = {};
 
@@ -31,6 +34,12 @@ export default class HomePage extends Component<Props> {
 
     ipcRenderer.on('$file.load.csv', (event, data) => {
       this.updateData(data)
+    })
+    ipcRenderer.on('$chart.get.image', () => {
+      if (this.chart) {
+        const url = this.chart.getEchartsInstance().getDataURL({backgroundColor: '#aaa'})
+        ipcRenderer.send('$chart.did-get.image', url)
+      }
     })
   }
 
@@ -71,10 +80,19 @@ export default class HomePage extends Component<Props> {
   }
 
   didSliderValueChanged(value) {
-    console.log(value)
     if (value) {
       ipcRenderer.send('$view.chart.slider.changed', value)
     }
+  }
+
+  zoomOut = () => {
+    if (this.chart) {
+
+    }
+  }
+
+  zoomIn = () => {
+
   }
 
   render() {
@@ -85,12 +103,18 @@ export default class HomePage extends Component<Props> {
       alignSelf: 'flex-end', position: 'absolute', right: '100px',
       zIndex: 100
     }
-    return (<div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-      {hasData && (<div style={sliderWrapper}>
-        <Slider min={1} marks={kMarks} step={null} onChange={this.didSliderValueChanged} defaultValue={1} max={7} />
-      </div>)}
-      {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
-      {!hasData && this._renderEmpty()}
-    </div>);
+    return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
+      <div></div>
+      <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
+        <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
+      <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
+        {hasData && (<div style={sliderWrapper}>
+          <Slider min={1} marks={kMarks} step={null} onChange={this.didSliderValueChanged} defaultValue={1} max={7} />
+        </div>)}
+        {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
+        {!hasData && this._renderEmpty()}
+      </div>
+      </SplitPane>
+    </SplitPane>);
   }
 }
