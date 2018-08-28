@@ -21,7 +21,9 @@ const kTimeScales = [
 const kMaxOpacity = 100
 
 type Props = {
-  updateOpacity: any
+  updateOpacity: any,
+  switchViewMode: any,
+  timeRanges: any
 }
 
 export default class ControlPanel extends PureComponent<Props> {
@@ -33,15 +35,15 @@ export default class ControlPanel extends PureComponent<Props> {
 
   constructor(props) {
     super(props)
-    this.state = {minium: false}
+    this.state = {minimum: false}
   }
 
-  showMinium = () => {
-    this.setState({minium: true})
+  showMinimum = () => {
+    this.setState({minimum: true})
   }
 
   showFull = () => {
-    this.setState({minium: false})
+    this.setState({minimum: false})
   }
 
   didChangeTimeScale = (event) => {
@@ -53,10 +55,16 @@ export default class ControlPanel extends PureComponent<Props> {
     this.props.updateOpacity(value * 1.0 / kMaxOpacity)
   }
 
+  didSwitchViewMode = (idx) => {
+    this.setState({viewMode: idx})
+    this.props.switchViewMode(idx)
+  }
+
   render() {
-    const {minium} = this.state
+    const {minimum, viewMode} = this.state
+    const {timeRanges} = this.props
     let content
-    if (minium) {
+    if (minimum) {
       content = (
         <div className={styles.controlpanel}>
           <div className={cx(styles['controlpanel-header'], styles['controlpanel-minium'])}>
@@ -68,11 +76,16 @@ export default class ControlPanel extends PureComponent<Props> {
     } else {
       content = (<div className={cx(styles.controlpanel, styles['controlpanel-full'])}>
         <div className={styles['controlpanel-header']}>控制面板
-          <div className={styles['controlpanel-icon']} onClick={this.showMinium}>
+          <div className={styles['controlpanel-icon']} onClick={this.showMinimum}>
             <FontAwesomeIcon icon={faChevronRight} />
           </div>
         </div>
-        <ViewModeControl />
+        <ViewModeControl didSwitchViewMode={this.didSwitchViewMode} />
+        {viewMode === 1 && (<Segment label="日期">
+          <select className={styles.selection} onChange={this.didChangeDate}>
+            {timeRanges.map((title, idx) => <option value={idx} key={title} className={styles.option}>{title}</option>)}
+          </select>
+        </Segment>)}
         <Segment label="透明度：">
           <div className={styles['slider-wrapper']}>
             <Slider min={0} max={kMaxOpacity} defaultValue={kMaxOpacity} onChange={this.didChangeOpacity} />

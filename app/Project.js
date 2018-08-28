@@ -140,6 +140,20 @@ function updateTimeRange(timeRange, parts, step = kDefaultStep) {
   return [timeLabels, result]
 }
 
+
+function generateFinalData(start, end, result, step) {
+  const timeRange = generateTimeRange(moment(start), moment(end), step)
+  const [timeLabels, finalData] = updateTimeRange(timeRange, result, step)
+
+  let title
+  if (end.diff(start, 'days') < 1) {
+    title = `${start.year()}-${start.month() + 1}-${start.date()}数据统计`
+  } else {
+    title = `${start.year()}-${start.month() + 1}-${start.date()}至${end.year()}-${end.month() + 1}-${end.date()}数据统计`
+  }
+  return [title, timeLabels, kSegments.map(k => k.text), finalData]
+}
+
 /**
  * @class Project
  */
@@ -164,6 +178,11 @@ export default class Project {
 
     ipcMain.on('$chart.did-get.image', (event, arg) => {
       this.saveImageData(arg)
+    })
+
+    ipcMain.on('$action.request.data', (event, step) => {
+      const {start, end, result} = this.currentData
+      event.sender.send('$action.request.data-reply', generateFinalData(start, end, result, step))
     })
 
     this.mainWindow.webContents.send('$project.show.tree', this.project.files)
@@ -194,16 +213,7 @@ export default class Project {
 
   updateData = () => {
     const {start, end, result, step} = this.currentData
-    const timeRange = generateTimeRange(moment(start), moment(end), step)
-    const [timeLabels, finalData] = updateTimeRange(timeRange, result, step)
-
-    let title
-    if (end.diff(start, 'days') < 1) {
-      title = `${start.year()}-${start.month() + 1}-${start.date()}数据统计`
-    } else {
-      title = `${start.year()}-${start.month() + 1}-${start.date()}至${end.year()}-${end.month() + 1}-${end.date()}数据统计`
-    }
-    this.mainWindow.webContents.send('$file.load.csv', [title, timeLabels, kSegments.map(k => k.text), finalData])
+    this.mainWindow.webContents.send('$file.load.csv', generateFinalData(start, end, result, step))
   }
 
   /**

@@ -9,7 +9,7 @@ import 'moment-timezone'
 
 import Sidebar from './Sidebar'
 import Toolbar from './Toolbar'
-import defaultOption from './option'
+import defaultOption, {kTimeOption} from './option'
 import ControlPanel from './ControlPanel'
 
 type Props = {};
@@ -73,6 +73,10 @@ export default class HomePage extends Component<Props> {
     ipcRenderer.on('$project.show.tree', (event, args) => {
       this.setState({tree: parseProjectTree(args)})
     })
+
+    ipcRenderer.on('$action.request.data-reply', (event, args) => {
+      this.switchToTimeMode(args)
+    })
   }
 
   updateData(data) {
@@ -87,7 +91,7 @@ export default class HomePage extends Component<Props> {
     }
 
     const option = Object.assign({}, defaultOption)
-    this.setState({option})
+    this.setState({option, originData: data})
     if (this.chart) {
       this.chart.getEchartsInstance().setOption(option)
     }
@@ -108,6 +112,66 @@ export default class HomePage extends Component<Props> {
     }
   }
 
+  switchTo3DMode = (data) => {
+    if (this.chart) {
+      this.chart.getEchartsInstance().clear()
+
+      const [title, timeLabels, segments, finalData] = data
+      const option = {...defaultOption}
+      option.title.text = title
+      option.xAxis3D.data = timeLabels
+      option.yAxis3D.data = segments
+      option.series[0].data = finalData
+      option.tooltip.formatter = (params) => {
+        const [x, y, z] = params.value
+        return `${timeLabels[x]} ${segments[y]} ${z}`
+      }
+      this.setState({ option})
+      this.chart.getEchartsInstance().setOption(option)
+    }
+  }
+
+  switchToTimeMode = () => {
+    if (this.chart) {
+      this.chart.getEchartsInstance().clear()
+
+      const { originData } = this.state
+      const [segments] = originData
+      const timeOption = { ...kTimeOption }
+      timeOption.xAxis[0].data = [
+        '15s',
+        '30s',
+        '60s',
+        '3min',
+        '10min',
+        '30min',
+        '60min',
+        '3h',
+        '3h+']
+      timeOption.series[0].data = segments[0].slice(0)
+      this.setState({ option: timeOption })
+      this.chart.getEchartsInstance().setOption(timeOption)
+    }
+  }
+
+  switchViewMode = (idx) => {
+    this.setState({viewMode: idx})
+    switch (idx) {
+      case 0: {
+        this.switchTo3DMode()
+        break
+      }
+      case 1: {
+        // 首先请求将项目合并为一天的数据
+        ipcRenderer.send('$action.request.data', 1440)
+        break
+      }
+      default: {
+        break
+      }
+    }
+  }
+
   zoomOut = () => {
   }
 
@@ -116,7 +180,7 @@ export default class HomePage extends Component<Props> {
   }
 
   render() {
-    const {option, tree} = this.state
+    const {option, tree, originData} = this.state
     const hasData = Object.keys(option).length > 0
 
     return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
@@ -124,7 +188,7 @@ export default class HomePage extends Component<Props> {
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-        {hasData && <ControlPanel updateOpacity={this.updateOpacity} />}
+        {hasData && <ControlPanel updateOpacity={this.updateOpacity} switchViewMode={this.switchViewMode} timeRanges={originData[1]} />}
         {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
         {!hasData && HomePage.renderEmpty()}
       </div>
