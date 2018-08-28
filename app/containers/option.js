@@ -1,12 +1,16 @@
 export default {
   title: {
     textStyle: {
-      align: 'center'
+      align: 'center',
+      color: '#aaa'
     }
   },
   tooltip: {},
   visualMap: {
     max: 20,
+    textStyle: {
+      color: '#aaa'
+    },
     inRange: {
       color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
     }
@@ -27,6 +31,16 @@ export default {
   grid3D: {
     boxWidth: 240,
     boxDepth: 200,
+    axisLine: {
+      lineStyle: {
+        color: '#aaa'
+      }
+    },
+    axisPointer: {
+      lineStyle: {
+        color: '#ffbd67'
+      }
+    },
     viewControl: {
       // projection: 'orthographic'
     },
@@ -50,16 +64,18 @@ export default {
         borderWidth: 1
       }
     },
-
+    itemStyle: {
+      opacity: 0.4
+    },
     emphasis: {
       label: {
         textStyle: {
           fontSize: 20,
-          color: '#999'
+          color: '#aaa'
         }
       },
       itemStyle: {
-        color: '#999'
+        color: '#aaa'
       }
     }
   }]

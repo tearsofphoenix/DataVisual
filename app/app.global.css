@@ -2,8 +2,8 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-@import "~@fortawesome/fontawesome-free/css/all.css";
-@import "~rc-slider/assets/index.css";
+@import '~@fortawesome/fontawesome-free/css/all.css';
+@import '~rc-slider/assets/index.css';
 
 body {
   margin: 0;
@@ -17,7 +17,7 @@ body {
 #root {
   height: 100%;
   min-height: 100%;
-  background: #aaa;
+  background: #272822;
 }
 
 h2 {
@@ -49,12 +49,12 @@ a:hover {
 }
 
 .rc-slider-mark-text {
-  color: #222222;
+  color: #aaa;
 }
 
 .Resizer {
   background: #000;
-  opacity: .2;
+  opacity: 0.2;
   z-index: 1;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;

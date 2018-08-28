@@ -28,6 +28,30 @@ const kMarks = {
 export default class HomePage extends Component<Props> {
   props: Props;
 
+  static renderEmpty() {
+    return <div style={{margin: '30% 0 auto',
+      position: 'relative',
+      width: '100%'
+    }}>
+      <div style={{color: 'rgba(60, 63, 65, 0.75)',
+        position: 'relative',
+        width: '100%',
+        wordWrap: 'break-word'}}>
+        <p style={{fontSize: 28,
+          fontWeight: 700,
+          lineHeight: '34px',
+          textAlign: 'center',
+          margin: '0 auto'}}>请先选择CSV数据文件</p>
+      </div>
+    </div>
+  }
+
+  static didSliderValueChanged(value) {
+    if (value) {
+      ipcRenderer.send('$view.chart.slider.changed', value)
+    }
+  }
+
   constructor() {
     super()
     this.state = {option: {}}
@@ -61,34 +85,7 @@ export default class HomePage extends Component<Props> {
     }
   }
 
-  _renderEmpty() {
-    return <div style={{margin: '30% 0 auto',
-      position: 'relative',
-      width: '100%'
-    }}>
-      <div style={{color: 'rgba(60, 63, 65, 0.75)',
-        position: 'relative',
-        width: '100%',
-        wordWrap: 'break-word'}}>
-        <p style={{fontSize: 28,
-          fontWeight: 700,
-          lineHeight: '34px',
-          textAlign: 'center',
-          margin: '0 auto'}}>请先选择CSV数据文件</p>
-      </div>
-    </div>
-  }
-
-  didSliderValueChanged(value) {
-    if (value) {
-      ipcRenderer.send('$view.chart.slider.changed', value)
-    }
-  }
-
   zoomOut = () => {
-    if (this.chart) {
-
-    }
   }
 
   zoomIn = () => {
@@ -104,15 +101,15 @@ export default class HomePage extends Component<Props> {
       zIndex: 100
     }
     return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
-      <div></div>
+      <Sidebar />
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
         {hasData && (<div style={sliderWrapper}>
-          <Slider min={1} marks={kMarks} step={null} onChange={this.didSliderValueChanged} defaultValue={1} max={7} />
+          <Slider min={1} marks={kMarks} step={null} onChange={HomePage.didSliderValueChanged} defaultValue={1} max={7} />
         </div>)}
         {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
-        {!hasData && this._renderEmpty()}
+        {!hasData && HomePage.renderEmpty()}
       </div>
       </SplitPane>
     </SplitPane>);

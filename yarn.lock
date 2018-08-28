@@ -6246,6 +6246,10 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
 
+js-tree@^2.0.1:
+  version "2.0.1"
+  resolved "http://registry.npm.taobao.org/js-tree/download/js-tree-2.0.1.tgz#14013121abdb38587c07eeffd6fcf78b443f9396"
+
 js-yaml@^3.11.0, js-yaml@^3.12.0, js-yaml@^3.4.3, js-yaml@^3.7.0, js-yaml@^3.9.0:
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
@@ -8826,6 +8830,14 @@ react-test-renderer@^16.0.0-0, react-test-renderer@^16.4.1:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
     react-is "^16.4.1"
+
+react-ui-tree@^4.0.0:
+  version "4.0.0"
+  resolved "http://registry.npm.taobao.org/react-ui-tree/download/react-ui-tree-4.0.0.tgz#99e36a68e274409485614ab1f31f52fdf884907e"
+  dependencies:
+    classnames "^2.2.5"
+    js-tree "^2.0.1"
+    prop-types "^15.5.10"
 
 react@^16.4.1:
   version "16.4.1"
