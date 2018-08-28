@@ -23,7 +23,8 @@ const kMaxOpacity = 100
 type Props = {
   updateOpacity: any,
   switchViewMode: any,
-  timeRanges: any
+  timeRanges: any,
+  didChangeDateInTimeMode: any
 }
 
 export default class ControlPanel extends PureComponent<Props> {
@@ -60,6 +61,11 @@ export default class ControlPanel extends PureComponent<Props> {
     this.props.switchViewMode(idx)
   }
 
+  didChangeDate = (event) => {
+    const {value} = event.target
+    this.props.didChangeDateInTimeMode(value)
+  }
+
   render() {
     const {minimum, viewMode} = this.state
     const {timeRanges} = this.props
@@ -83,7 +89,7 @@ export default class ControlPanel extends PureComponent<Props> {
         <ViewModeControl didSwitchViewMode={this.didSwitchViewMode} />
         {viewMode === 1 && (<Segment label="日期">
           <select className={styles.selection} onChange={this.didChangeDate}>
-            {timeRanges.map((title, idx) => <option value={idx} key={title} className={styles.option}>{title}</option>)}
+            {timeRanges.map((title, idx) => <option value={idx} key={idx} className={styles.option}>{title.substring(0, 5)}</option>)}
           </select>
         </Segment>)}
         <Segment label="透明度：">

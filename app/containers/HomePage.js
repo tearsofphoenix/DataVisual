@@ -57,7 +57,9 @@ export default class HomePage extends Component<Props> {
   constructor() {
     super()
     this.state = {
-      option: {}, tree: {}
+      option: {},
+      tree: {},
+      timeRanges: []
     }
 
     ipcRenderer.on('$file.load.csv', (event, data) => {
@@ -112,11 +114,11 @@ export default class HomePage extends Component<Props> {
     }
   }
 
-  switchTo3DMode = (data) => {
+  switchTo3DMode = () => {
     if (this.chart) {
       this.chart.getEchartsInstance().clear()
-
-      const [title, timeLabels, segments, finalData] = data
+      const {originData} = this.state
+      const [title, timeLabels, segments, finalData] = originData
       const option = {...defaultOption}
       option.title.text = title
       option.xAxis3D.data = timeLabels
@@ -131,12 +133,11 @@ export default class HomePage extends Component<Props> {
     }
   }
 
-  switchToTimeMode = () => {
+  switchToTimeMode = (data) => {
     if (this.chart) {
       this.chart.getEchartsInstance().clear()
 
-      const { originData } = this.state
-      const [segments] = originData
+      const segments = data[2]
       const timeOption = { ...kTimeOption }
       timeOption.xAxis[0].data = [
         '15s',
@@ -149,9 +150,30 @@ export default class HomePage extends Component<Props> {
         '3h',
         '3h+']
       timeOption.series[0].data = segments[0].slice(0)
-      this.setState({ option: timeOption })
+      this.setState({ option: timeOption, timeData: data, timeRanges: data[1], dateIndex: 0 })
       this.chart.getEchartsInstance().setOption(timeOption)
     }
+  }
+
+  didChangeDateInTimeMode = (idx) => {
+    const dateIndex = parseInt(idx, 10)
+    const {timeData} = this.state
+    const segments = timeData[2]
+    const timeOption = { ...kTimeOption }
+    timeOption.xAxis[0].data = [
+      '15s',
+      '30s',
+      '60s',
+      '3min',
+      '10min',
+      '30min',
+      '60min',
+      '3h',
+      '3h+']
+    console.log(173, segments, dateIndex)
+    timeOption.series[0].data = segments[dateIndex].slice(0)
+    this.setState({ option: timeOption, dateIndex})
+    this.chart.getEchartsInstance().setOption(timeOption)
   }
 
   switchViewMode = (idx) => {
@@ -180,7 +202,7 @@ export default class HomePage extends Component<Props> {
   }
 
   render() {
-    const {option, tree, originData} = this.state
+    const {option, tree, timeRanges} = this.state
     const hasData = Object.keys(option).length > 0
 
     return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
@@ -188,7 +210,7 @@ export default class HomePage extends Component<Props> {
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-        {hasData && <ControlPanel updateOpacity={this.updateOpacity} switchViewMode={this.switchViewMode} timeRanges={originData[1]} />}
+        {hasData && <ControlPanel updateOpacity={this.updateOpacity} switchViewMode={this.switchViewMode} timeRanges={timeRanges} didChangeDateInTimeMode={this.didChangeDateInTimeMode} />}
         {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
         {!hasData && HomePage.renderEmpty()}
       </div>
