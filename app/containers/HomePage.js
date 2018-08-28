@@ -6,25 +6,15 @@ import ReactEcharts from 'echarts-for-react'
 import {ipcRenderer} from 'electron'
 import moment from 'moment'
 import 'moment-timezone'
-import Slider from 'rc-slider'
+
 import Sidebar from './Sidebar'
 import Toolbar from './Toolbar'
 import defaultOption from './option'
+import ControlPanel from './ControlPanel'
 
 type Props = {};
 
 moment.tz.setDefault('Asia/Shanghai')
-
-const kMarks = {
-1: '10min',
-2: '30min',
-3: '1h',
-4: '4h',
-5: '12h',
-6: '1d',
-7: '7d'
-}
-
 
 /**
  *
@@ -34,7 +24,9 @@ function parseProjectTree(files) {
   const obj = {}
   files.forEach(file => {
     if (typeof file === 'string') {
-      obj.module = file
+      const parts = file.split('\\')
+      obj.module = parts[parts.length - 1]
+      obj.path  = file
       obj.children = []
     }
   })
@@ -60,12 +52,6 @@ export default class HomePage extends Component<Props> {
           margin: '0 auto'}}>请先选择CSV数据文件</p>
       </div>
     </div>
-  }
-
-  static didSliderValueChanged(value) {
-    if (value) {
-      ipcRenderer.send('$view.chart.slider.changed', value)
-    }
   }
 
   constructor() {
@@ -117,19 +103,13 @@ export default class HomePage extends Component<Props> {
   render() {
     const {option, tree} = this.state
     const hasData = Object.keys(option).length > 0
-    const sliderWrapper = {
-      margin: '20px 40px', width: '400px', display: 'flex',
-      alignSelf: 'flex-end', position: 'absolute', right: '100px',
-      zIndex: 100
-    }
+
     return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
       <Sidebar tree={tree} />
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-        {hasData && (<div style={sliderWrapper}>
-          <Slider min={1} marks={kMarks} step={null} onChange={HomePage.didSliderValueChanged} defaultValue={1} max={7} />
-        </div>)}
+        {hasData && <ControlPanel />}
         {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
         {!hasData && HomePage.renderEmpty()}
       </div>

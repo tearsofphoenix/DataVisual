@@ -1,0 +1,56 @@
+.controlpanel {
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  position: absolute;
+  right: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #3c3f41;
+  color: #aaa;
+}
+
+.controlpanel-header {
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.controlpanel-minium {
+  border-bottom: none;
+}
+
+.controlpanel-icon {
+  width: 1rem;
+}
+
+.slider-wrapper {
+  margin: 20px 40px;
+  width: 400px;
+  display: flex;
+}
+
+.item-wrapper {
+  display: flex;
+  padding: 1px;
+  height: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.item {
+  width: 2.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.item-selected {
+  background: #ded9d9;
+  color: #222;
+}

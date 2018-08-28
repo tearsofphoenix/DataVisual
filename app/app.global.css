@@ -102,3 +102,8 @@ a:hover {
 .Resizer.disabled:hover {
   border-color: transparent;
 }
+
+.node {
+  white-space: nowrap;
+  font-size: 12px;
+}
