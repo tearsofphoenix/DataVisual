@@ -21,14 +21,31 @@
   border-bottom: none;
 }
 
+.controlpanel-full {
+  min-width: 240px;
+}
+
 .controlpanel-icon {
   width: 1rem;
 }
 
 .slider-wrapper {
-  margin: 20px 40px;
-  width: 400px;
+  width: 140px;
   display: flex;
+}
+
+.selection {
+  height: 1.6rem;
+  width: 4rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: #ddd;
+  outline: none;
+}
+
+.option {
+  background: #3c3f41;
 }
 
 .item-wrapper {

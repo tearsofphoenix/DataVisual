@@ -65,7 +65,7 @@ export default {
       }
     },
     itemStyle: {
-      opacity: 0.4
+      opacity: 1
     },
     emphasis: {
       label: {

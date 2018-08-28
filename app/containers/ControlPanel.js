@@ -6,18 +6,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import styles from './segment.css'
 import ViewModeControl from './ViewModeControl'
+import Segment from '../components/Segment'
 
-const kMarks = {
-  1: '10min',
-  2: '30min',
-  3: '1h',
-  4: '4h',
-  5: '12h',
-  6: '1d',
-  7: '7d'
+const kTimeScales = [
+  {value: 1, name: '10min'},
+  {value: 2, name: '30min'},
+  {value: 3, name: '1h'},
+  {value: 4, name: '4h'},
+  {value: 5, name: '12h'},
+  {value: 6, name: '1d'},
+  {value: 7, name: '7d'},
+]
+
+const kMaxOpacity = 100
+
+type Props = {
+  updateOpacity: any
 }
 
-export default class ControlPanel extends PureComponent {
+export default class ControlPanel extends PureComponent<Props> {
   static didSliderValueChanged(value) {
     if (value) {
       ipcRenderer.send('$view.chart.slider.changed', value)
@@ -37,6 +44,15 @@ export default class ControlPanel extends PureComponent {
     this.setState({minium: false})
   }
 
+  didChangeTimeScale = (event) => {
+    const {value} = event.target
+    ControlPanel.didSliderValueChanged(value)
+  }
+
+  didChangeOpacity = (value) => {
+    this.props.updateOpacity(value * 1.0 / kMaxOpacity)
+  }
+
   render() {
     const {minium} = this.state
     let content
@@ -50,17 +66,23 @@ export default class ControlPanel extends PureComponent {
           </div>
         </div>)
     } else {
-      content = (<div className={styles.controlpanel}>
+      content = (<div className={cx(styles.controlpanel, styles['controlpanel-full'])}>
         <div className={styles['controlpanel-header']}>控制面板
           <div className={styles['controlpanel-icon']} onClick={this.showMinium}>
             <FontAwesomeIcon icon={faChevronRight} />
           </div>
         </div>
         <ViewModeControl />
-        <div className={styles['slider-wrapper']}>
-          <Slider min={1} marks={kMarks} step={null} onChange={ControlPanel.didSliderValueChanged} defaultValue={1}
-                  max={7} />
-        </div>
+        <Segment label="透明度：">
+          <div className={styles['slider-wrapper']}>
+            <Slider min={0} max={kMaxOpacity} defaultValue={kMaxOpacity} onChange={this.didChangeOpacity} />
+          </div>
+        </Segment>
+        <Segment label="时间粒度：">
+          <select className={styles.selection} onChange={this.didChangeTimeScale}>
+            {kTimeScales.map(({value, name}) => <option value={value} key={value} className={styles.option}>{name}</option>)}
+          </select>
+        </Segment>
       </div>)
     }
 

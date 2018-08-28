@@ -93,6 +93,21 @@ export default class HomePage extends Component<Props> {
     }
   }
 
+  updateOpacity = (opacity) => {
+    if(opacity > 1) {
+      opacity = 1
+    }
+    if (opacity < 0) {
+      opacity = 0
+    }
+    if (this.chart) {
+      let {option} = this.state
+      option = {...option}
+      option.series[0].itemStyle.opacity = opacity
+      this.chart.getEchartsInstance().setOption(option)
+    }
+  }
+
   zoomOut = () => {
   }
 
@@ -109,7 +124,7 @@ export default class HomePage extends Component<Props> {
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>
-        {hasData && <ControlPanel />}
+        {hasData && <ControlPanel updateOpacity={this.updateOpacity} />}
         {hasData && <ReactEcharts ref={e => {this.chart = e}} option={option} style={{width: '100%', height: '100%'}} />}
         {!hasData && HomePage.renderEmpty()}
       </div>
