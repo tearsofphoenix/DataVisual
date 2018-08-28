@@ -4,6 +4,7 @@
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 @import '~rc-slider/assets/index.css';
+@import "~react-ui-tree/dist/react-ui-tree.css";
 
 body {
   margin: 0;

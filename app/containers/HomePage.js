@@ -25,6 +25,22 @@ const kMarks = {
 7: '7d'
 }
 
+
+/**
+ *
+ * @param files
+ */
+function parseProjectTree(files) {
+  const obj = {}
+  files.forEach(file => {
+    if (typeof file === 'string') {
+      obj.module = file
+      obj.children = []
+    }
+  })
+  return obj
+}
+
 export default class HomePage extends Component<Props> {
   props: Props;
 
@@ -54,7 +70,9 @@ export default class HomePage extends Component<Props> {
 
   constructor() {
     super()
-    this.state = {option: {}}
+    this.state = {
+      option: {}, tree: {}
+    }
 
     ipcRenderer.on('$file.load.csv', (event, data) => {
       this.updateData(data)
@@ -64,6 +82,10 @@ export default class HomePage extends Component<Props> {
         const url = this.chart.getEchartsInstance().getDataURL({backgroundColor: '#aaa'})
         ipcRenderer.send('$chart.did-get.image', url)
       }
+    })
+
+    ipcRenderer.on('$project.show.tree', (event, args) => {
+      this.setState({tree: parseProjectTree(args)})
     })
   }
 
@@ -93,7 +115,7 @@ export default class HomePage extends Component<Props> {
   }
 
   render() {
-    const {option} = this.state
+    const {option, tree} = this.state
     const hasData = Object.keys(option).length > 0
     const sliderWrapper = {
       margin: '20px 40px', width: '400px', display: 'flex',
@@ -101,7 +123,7 @@ export default class HomePage extends Component<Props> {
       zIndex: 100
     }
     return (<SplitPane split="vertical" minSize={200} defaultSize={200} maxSize={200}>
-      <Sidebar />
+      <Sidebar tree={tree} />
       <SplitPane split="horizontal" minSize={28} maxSize={28} defaultSize={28}>
         <Toolbar zoomIn={this.zoomIn} zoomOut={this.zoomOut} />
       <div style={{width: '100%', height: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column'}}>

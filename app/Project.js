@@ -165,6 +165,8 @@ export default class Project {
     ipcMain.on('$chart.did-get.image', (event, arg) => {
       this.saveImageData(arg)
     })
+
+    this.mainWindow.webContents.send('$project.show.tree', this.project.files)
   }
 
   /**

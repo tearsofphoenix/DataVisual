@@ -3,7 +3,9 @@ import React, { Component } from 'react'
 import cx from 'classnames'
 import Tree from 'react-ui-tree'
 
-type Props = {};
+type Props = {
+  tree: any
+};
 
 export default class Sidebar extends Component<Props> {
   props: Props;
@@ -11,10 +13,8 @@ export default class Sidebar extends Component<Props> {
   constructor() {
     super()
     this.state = {
-      tree: {},
       active: null
     }
-
   }
 
   renderNode = node => {
@@ -43,14 +43,8 @@ export default class Sidebar extends Component<Props> {
     this.setState({ tree });
   };
 
-  updateTree = () => {
-    const { tree } = this.state;
-    tree.children.push({ module: 'test' });
-    this.setState({ tree });
-  };
-
   render() {
-    const {tree} = this.state
+    const {tree} = this.props
     return (
         <div className="tree">
           <Tree
