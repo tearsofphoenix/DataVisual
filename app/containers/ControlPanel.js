@@ -36,7 +36,7 @@ export default class ControlPanel extends PureComponent<Props> {
 
   constructor(props) {
     super(props)
-    this.state = {minimum: false}
+    this.state = {minimum: false, viewMode: 0}
   }
 
   showMinimum = () => {
@@ -87,21 +87,21 @@ export default class ControlPanel extends PureComponent<Props> {
           </div>
         </div>
         <ViewModeControl didSwitchViewMode={this.didSwitchViewMode} />
-        {viewMode === 1 && (<Segment label="日期">
+        {viewMode === 1 && (<Segment label="日期：">
           <select className={styles.selection} onChange={this.didChangeDate}>
             {timeRanges.map((title, idx) => <option value={idx} key={idx} className={styles.option}>{title.substring(0, 5)}</option>)}
           </select>
         </Segment>)}
-        <Segment label="透明度：">
+        {viewMode === 0 && <Segment label="透明度：">
           <div className={styles['slider-wrapper']}>
             <Slider min={0} max={kMaxOpacity} defaultValue={kMaxOpacity} onChange={this.didChangeOpacity} />
           </div>
-        </Segment>
-        <Segment label="时间粒度：">
+        </Segment>}
+        {viewMode === 0 && <Segment label="时间粒度：">
           <select className={styles.selection} onChange={this.didChangeTimeScale}>
             {kTimeScales.map(({value, name}) => <option value={value} key={value} className={styles.option}>{name}</option>)}
           </select>
-        </Segment>
+        </Segment>}
       </div>)
     }
 

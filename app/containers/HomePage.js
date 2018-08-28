@@ -150,6 +150,7 @@ export default class HomePage extends Component<Props> {
         '3h',
         '3h+']
       timeOption.series[0].data = segments[0].slice(0)
+      timeOption.title.text = data[1][0].substring(0, 5) + '统计'
       this.setState({ option: timeOption, timeData: data, timeRanges: data[1], dateIndex: 0 })
       this.chart.getEchartsInstance().setOption(timeOption)
     }
@@ -157,19 +158,10 @@ export default class HomePage extends Component<Props> {
 
   didChangeDateInTimeMode = (idx) => {
     const dateIndex = parseInt(idx, 10)
-    const {timeData} = this.state
+    const {timeData, option} = this.state
     const segments = timeData[2]
-    const timeOption = { ...kTimeOption }
-    timeOption.xAxis[0].data = [
-      '15s',
-      '30s',
-      '60s',
-      '3min',
-      '10min',
-      '30min',
-      '60min',
-      '3h',
-      '3h+']
+    const timeOption = { ...option }
+    timeOption.title.text = timeData[1][dateIndex].substring(0, 5) + '统计'
     console.log(173, segments, dateIndex)
     timeOption.series[0].data = segments[dateIndex].slice(0)
     this.setState({ option: timeOption, dateIndex})

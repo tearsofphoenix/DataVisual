@@ -1,4 +1,10 @@
 export const kTimeOption = {
+  title: {
+    textStyle: {
+      align: 'center',
+      color: '#aaa'
+    }
+  },
   color: ['#3398DB'],
   textStyle: {
     color: '#aaa'
