@@ -79,6 +79,9 @@ function findTimeRange(parts) {
       finalEnd = moment(end)
     }
   })
+  if (finalEnd.diff(finalStart, 'months') > 1) {
+    finalEnd = moment(finalStart).add(1, 'month')
+  }
   return [finalStart, finalEnd]
 }
 
